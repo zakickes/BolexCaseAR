@@ -19,7 +19,7 @@
       font-size: 16px;
       border: none;
       border-radius: 8px;
-      text-decoration: none;
+      cursor: pointer;
       display: none;
       z-index: 10;
     }
@@ -42,7 +42,7 @@
     loading="eager">
 </model-viewer>
 
-<a id="arbutton" rel="ar" href="model_bolex.usdz">👋 View in AR</a>
+<button id="arbutton">👋 View in AR</button>
 
 <script>
   const modelViewer = document.getElementById("modelViewer");
@@ -50,6 +50,10 @@
 
   modelViewer.addEventListener("load", () => {
     arButton.style.display = "block";
+  });
+
+  arButton.addEventListener("click", () => {
+    modelViewer.activateAR();
   });
 </script>
 

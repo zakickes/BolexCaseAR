@@ -6,8 +6,8 @@
   <title>Bolex AR Model</title>
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
   <style>
-    body { margin:0; font-family:system-ui, -apple-system, "Segoe UI", Roboto; }
-    model-viewer { width:100vw; height:100vh; display:block; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto; }
+    model-viewer { width: 100vw; height: 100vh; display: block; background: white; }
     #arbutton {
       position: fixed;
       bottom: 20px;
@@ -28,18 +28,22 @@
 <body>
 
 <model-viewer
-    id="modelViewer"
-    src="model.glb"
-    ios-src="model_bolex.usdz"
-    alt="Bolex 3D model"
-    camera-controls
-    auto-rotate
-    ar
-    ar-scale="fixed"
-    ar-modes="webxr scene-viewer quick-look"
-    shadow-intensity="0.5"
-    exposure="1"
-    loading="eager">
+  id="modelViewer"
+  src="model.glb"
+  ios-src="model_bolex.usdz"
+  alt="Bolex 3D model"
+  camera-controls
+  camera-target="auto auto auto"
+  camera-orbit="45deg 65deg 120%"
+  field-of-view="30deg"
+  orientation="-90deg 0deg 0deg"
+  auto-rotate
+  ar
+  ar-scale="fixed"
+  ar-modes="webxr scene-viewer quick-look"
+  shadow-intensity="0.5"
+  exposure="1"
+  loading="eager">
 </model-viewer>
 
 <button id="arbutton">👋 View in AR</button>
@@ -48,11 +52,13 @@
   const modelViewer = document.getElementById("modelViewer");
   const arButton = document.getElementById("arbutton");
 
-  modelViewer.addEventListener("load", () => {
+  modelViewer.addEventListener("load", async () => {
+    await modelViewer.updateComplete;
     arButton.style.display = "block";
   });
 
-  arButton.addEventListener("click", () => {
+  arButton.addEventListener("click", async () => {
+    await modelViewer.updateComplete;
     modelViewer.activateAR();
   });
 </script>

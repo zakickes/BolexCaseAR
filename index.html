@@ -88,7 +88,7 @@
 
     button.addEventListener('click', async () => {
       status.textContent = 'Opening AR…';
-      viewer.orientation = '-90deg 0deg 0deg';
+      viewer.orientation = '0deg 90deg 0deg';
       await viewer.updateComplete;
       viewer.activateAR();
     });

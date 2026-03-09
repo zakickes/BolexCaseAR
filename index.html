@@ -8,31 +8,32 @@
   <style>
     body {
       margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       background: #fff;
     }
 
+    /* Keep model-viewer active, but invisible */
     model-viewer {
-      width: 100vw;
-      height: 100vh;
-      display: block;
-      background: #fff;
+      position: fixed;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden;
     }
 
     #arbutton {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 24px;
+      padding: 16px 28px;
       background: #007aff;
-      color: #fff;
-      font-size: 16px;
+      color: white;
+      font-size: 18px;
       border: none;
       border-radius: 10px;
       cursor: pointer;
-      display: none;
-      z-index: 10;
     }
   </style>
 </head>
@@ -43,17 +44,9 @@
   src="model.glb"
   ios-src="model_bolex.usdz"
   alt="Bolex 3D model"
-  camera-controls
-  auto-rotate
-  orientation="-90deg 0deg 0deg"
-  camera-target="auto auto auto"
-  camera-orbit="45deg 65deg 120%"
-  field-of-view="30deg"
   ar
   ar-scale="fixed"
   ar-modes="webxr scene-viewer quick-look"
-  shadow-intensity="0.5"
-  exposure="1"
   loading="eager">
 </model-viewer>
 
@@ -64,8 +57,9 @@
   const arButton = document.getElementById("arbutton");
 
   modelViewer.addEventListener("load", async () => {
+    // Use the rotation that gave you the correct AR result
+    modelViewer.orientation = "-90deg 0deg 0deg";
     await modelViewer.updateComplete;
-    arButton.style.display = "block";
   });
 
   arButton.addEventListener("click", async () => {

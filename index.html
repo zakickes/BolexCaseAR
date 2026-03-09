@@ -1,78 +1,91 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Bolex Case AR</title>
-  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-      background: #fff;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bolex Case AR</title>
 
-    model-viewer {
-      display: block;
-      width: 100vw;
-      height: 100vh;
-      background: #fff;
-    }
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
-    #arbutton {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 14px 26px;
-      background: #007aff;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      display: none;
-      z-index: 10;
-    }
-  </style>
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+
+model-viewer{
+  width:100vw;
+  height:100vh;
+  background:#ffffff;
+}
+
+#arbutton{
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:14px 26px;
+  background:#007aff;
+  color:white;
+  font-size:16px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  display:none;
+}
+</style>
 </head>
+
 <body>
 
-  <model-viewer
-    id="modelViewer"
-    src="model.glb"
-    ios-src="model_bolex.usdz"
-    alt="Bolex case contents"
-    camera-controls
-    auto-rotate
-    orientation="-90deg 0deg 0deg"
-    camera-orbit="45deg 65deg 120%"
-    field-of-view="30deg"
-    ar
-    ar-scale="fixed"
-    ar-modes="webxr scene-viewer quick-look"
-    shadow-intensity="0.7"
-    exposure="1"
-    loading="eager">
-  </model-viewer>
+<model-viewer
+  id="modelViewer"
+  src="model.glb"
+  ios-src="model_bolex.usdz"
+  alt="Bolex case contents"
 
-  <button id="arbutton">View in AR</button>
+  camera-controls
+  auto-rotate
 
-  <script>
-    const viewer = document.getElementById("modelViewer");
-    const button = document.getElementById("arbutton");
+  orientation="0deg 90deg 0deg"
 
-    viewer.addEventListener("load", async () => {
-      viewer.orientation = "-90deg 0deg 0deg";
-      await viewer.updateComplete;
-      button.style.display = "block";
-    });
+  camera-target="0m 0m 0m"
+  camera-orbit="30deg 65deg 120%"
+  field-of-view="30deg"
 
-    button.addEventListener("click", async () => {
-      await viewer.updateComplete;
-      viewer.activateAR();
-    });
-  </script>
+  ar
+  ar-scale="fixed"
+  ar-modes="webxr scene-viewer quick-look"
+
+  shadow-intensity="0.7"
+  exposure="1"
+
+  loading="eager">
+</model-viewer>
+
+<button id="arbutton">View in AR</button>
+
+<script>
+const viewer = document.getElementById("modelViewer");
+const button = document.getElementById("arbutton");
+
+viewer.addEventListener("load", async () => {
+
+  await viewer.updateComplete;
+
+  // ensure the same orientation is applied before AR launch
+  viewer.orientation = "-90deg 0deg 0deg";
+
+  button.style.display = "block";
+});
+
+button.addEventListener("click", async () => {
+
+  await viewer.updateComplete;
+  viewer.activateAR();
+
+});
+</script>
 
 </body>
 </html>

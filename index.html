@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bolex AR Model</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body { margin:0; font-family:system-ui, -apple-system, "Segoe UI", Roboto; }
+    model-viewer { width:100vw; height:100vh; display:block; }
+    #arbutton {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      background: #007aff;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: none; /* hidden until model loads */
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+<model-viewer
+    id="modelViewer"
+    src="https://zakickes.github.io/BolexAR/model.glb"
+    ios-src="https://zakickes.github.io/BolexAR/model_bolex.usdz"
+    alt="Bolex 3D model"
+    camera-controls
+    auto-rotate
+    ar
+    ar-scale="fixed"
+    ar-modes="webxr scene-viewer quick-look"
+    shadow-intensity="0.5"
+    exposure="1"
+    loading="eager">
+</model-viewer>
+
+<button id="arbutton">👋 View in AR</button>
+
+<script>
+  const modelViewer = document.getElementById("modelViewer");
+  const arButton = document.getElementById("arbutton");
+
+  // Show custom AR button once model is loaded
+  modelViewer.addEventListener("load", () => {
+    arButton.style.display = "block";
+  });
+
+  // Launch AR manually when the button is clicked
+  arButton.addEventListener("click", () => {
+    modelViewer.activateAR();
+  });
+</script>
+
+</body>
+</html>

@@ -7,20 +7,46 @@
 
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/dev/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    #status {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 10;
+      padding: 10px 12px;
+      color: white;
+      background: rgba(0,0,0,0.65);
+      border-radius: 8px;
+      text-align: center;
+    }
+  </style>
 </head>
 
-<body style="margin: 0px; overflow: hidden;">
+<body>
+  <div id="status">Loading AR…</div>
+
   <a-scene embedded arjs renderer="colorManagement: true;">
+    <a-assets>
+      <a-asset-item id="bolexModel" src="model_bolex.glb"></a-asset-item>
+    </a-assets>
+
     <a-marker preset="hiro" id="marker">
       <a-entity light="type: ambient; intensity: 1.5"></a-entity>
       <a-entity light="type: directional; intensity: 1.5" position="1 2 1"></a-entity>
 
       <a-entity
         id="model"
-        gltf-model="model_bolex.glb"
-        position="0 1 0"
+        gltf-model="#bolexModel"
+        position="0 0.5 0"
         rotation="0 0 0"
-        scale="5 5 5">
+        scale="0.05 0.05 0.05">
       </a-entity>
     </a-marker>
 
@@ -28,14 +54,37 @@
   </a-scene>
 
   <script>
+    const status = document.getElementById('status');
+    const marker = document.getElementById('marker');
     const model = document.getElementById('model');
+    const asset = document.getElementById('bolexModel');
 
-    model.addEventListener('model-loaded', () => {
-      console.log('model loaded');
+    marker.addEventListener('markerFound', () => {
+      status.textContent = 'Marker found';
+    });
+
+    marker.addEventListener('markerLost', () => {
+      status.textContent = 'Marker lost';
+    });
+
+    asset.addEventListener('loaded', () => {
+      console.log('asset loaded');
+      status.textContent = 'GLB asset loaded';
+    });
+
+    asset.addEventListener('error', (e) => {
+      console.error('asset error', e);
+      status.textContent = 'GLB asset failed to load';
+    });
+
+    model.addEventListener('model-loaded', (e) => {
+      console.log('model loaded', e);
+      status.textContent = 'Model loaded';
     });
 
     model.addEventListener('model-error', (e) => {
       console.error('model error', e);
+      status.textContent = 'Model failed to render';
     });
   </script>
 </body>

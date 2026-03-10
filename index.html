@@ -1,69 +1,21 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Bolex Case AR</title>
 
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
-  <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.7/aframe/build/aframe-ar.js"></script>
-
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    }
-
-    #info {
-      position: absolute;
-      left: 12px;
-      right: 12px;
-      bottom: 12px;
-      z-index: 10;
-      padding: 10px 12px;
-      color: white;
-      background: rgba(0,0,0,0.55);
-      border-radius: 8px;
-      text-align: center;
-    }
-  </style>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/dev/aframe/build/aframe-ar.js"></script>
 </head>
-<body>
 
-  <div id="info">Point camera at marker</div>
-
-  <a-scene
-    embedded
-    vr-mode-ui="enabled: false"
-    renderer="logarithmicDepthBuffer: true; antialias: true; alpha: true;"
-    arjs="sourceType: webcam; debugUIEnabled: false;"
-  >
-    <a-marker preset="hiro" emitevents="true" id="marker">
-      <a-entity
-        id="content"
-        gltf-model="model.glb"
-        position="0 0 0"
-        rotation="-90 0 0"
-        scale="0.05 0.05 0.05"
-      ></a-entity>
+<body style="margin: 0px; overflow: hidden;">
+  <a-scene embedded arjs>
+    <a-marker preset="hiro">
+      <a-box position="0 0.5 0" color="red"></a-box>
     </a-marker>
 
     <a-entity camera></a-entity>
   </a-scene>
-
-  <script>
-    const info = document.getElementById('info');
-    const marker = document.getElementById('marker');
-
-    marker.addEventListener('markerFound', () => {
-      info.textContent = 'Marker found';
-    });
-
-    marker.addEventListener('markerLost', () => {
-      info.textContent = 'Marker lost';
-    });
-  </script>
-
 </body>
 </html>

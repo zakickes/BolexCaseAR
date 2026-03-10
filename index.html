@@ -39,7 +39,12 @@
     <a-asset-item id="bolexModel" src="model_bolex.glb"></a-asset-item>
   </a-assets>
 
-  <a-marker preset="hiro" size="0.083" id="marker">
+  <a-marker preset="hiro"
+    size="0.083"
+    smooth="true"
+    smooth-count="5"
+    smooth-tolerance="0.01"
+    smooth-threshold="2" id="marker">
 
     <a-entity light="type: ambient; intensity: 1.5"></a-entity>
     <a-entity light="type: directional; intensity: 1.5" position="1 2 1"></a-entity>

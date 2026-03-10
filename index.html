@@ -25,6 +25,7 @@
       background: rgba(0,0,0,0.65);
       border-radius: 8px;
       text-align: center;
+      white-space: pre-line;
     }
   </style>
 </head>
@@ -37,14 +38,14 @@
       <a-asset-item id="bolexModel" src="model_bolex.glb"></a-asset-item>
     </a-assets>
 
-    <a-marker preset="hiro" size="0.0825" id="marker">
+    <a-marker preset="hiro" size="0.083" id="marker">
       <a-entity light="type: ambient; intensity: 1.5"></a-entity>
       <a-entity light="type: directional; intensity: 1.5" position="1 2 1"></a-entity>
 
       <a-entity
         id="model"
         gltf-model="#bolexModel"
-        position="0 0.5 0"
+        position="0 0 0"
         rotation="0 0 0"
         scale="1 1 1">
       </a-entity>
@@ -54,81 +55,70 @@
   </a-scene>
 
   <script>
-  const status = document.getElementById('status');
-  const marker = document.getElementById('marker');
-  const model = document.getElementById('model');
-  const asset = document.getElementById('bolexModel');
+    const status = document.getElementById('status');
+    const marker = document.getElementById('marker');
+    const model = document.getElementById('model');
 
-  marker.addEventListener('markerFound', () => {
-    status.textContent = 'Marker found';
-  });
+    // SET THIS TO THE TRUE PHYSICAL WIDTH OF YOUR OBJECT
+    // Example: 8.0 inches = 0.2032 m
+    const REAL_MODEL_WIDTH_METERS = 0.2032;
 
-  marker.addEventListener('markerLost', () => {
-    status.textContent = 'Marker lost';
-  });
+    marker.addEventListener('markerFound', () => {
+      status.textContent = 'Marker found';
+    });
 
-  asset.addEventListener('loaded', () => {
-    console.log('asset loaded');
-    status.textContent = 'GLB asset loaded';
-  });
+    marker.addEventListener('markerLost', () => {
+      status.textContent = 'Marker lost';
+    });
 
-  asset.addEventListener('error', (e) => {
-    console.error('asset error', e);
-    status.textContent = 'GLB asset failed to load';
-  });
+    model.addEventListener('model-loaded', () => {
+      const mesh = model.getObject3D('mesh');
 
-  model.addEventListener('model-loaded', () => {
-    const mesh = model.getObject3D('mesh');
+      if (!mesh) {
+        status.textContent = 'Model loaded, but mesh not found';
+        return;
+      }
 
-    if (!mesh) {
-      status.textContent = 'Model loaded but mesh not found';
-      return;
-    }
+      // Reset any previous transforms so math is clean
+      model.object3D.scale.set(1, 1, 1);
+      model.object3D.position.set(0, 0, 0);
 
-    const box = new THREE.Box3().setFromObject(mesh);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
+      // Measure native GLB size at scale 1
+      const box = new THREE.Box3().setFromObject(mesh);
+      const size = new THREE.Vector3();
+      const center = new THREE.Vector3();
+      box.getSize(size);
+      box.getCenter(center);
 
-    console.log('original size:', size);
-    console.log('original center:', center);
+      // Center the mesh geometry around the model origin
+      mesh.position.sub(center);
 
-    // Recenter mesh so its true center sits on the marker origin
-    mesh.position.x -= center.x;
-    mesh.position.y -= center.y;
-    mesh.position.z -= center.z;
+      // Recompute after recentering
+      const box2 = new THREE.Box3().setFromObject(mesh);
+      const size2 = new THREE.Vector3();
+      const min2 = new THREE.Vector3();
+      box2.getSize(size2);
+      box2.getMin(min2);
 
-    // Recompute after recentering
-    const box2 = new THREE.Box3().setFromObject(mesh);
-    const size2 = new THREE.Vector3();
-    const min2 = new THREE.Vector3();
-    box2.getSize(size2);
-    box2.getMin(min2);
+      const nativeWidth = size2.x;
+      const scaleFactor = REAL_MODEL_WIDTH_METERS / nativeWidth;
 
-    console.log('recentered size:', size2);
-    console.log('recentered min:', min2);
+      model.object3D.scale.set(scaleFactor, scaleFactor, scaleFactor);
 
-    // Set desired real-world width of the model
-    // Change this to the width you want in meters
-    const targetWidth = 0.2032; // 8 inches
+      // Put bottom of model on marker plane
+      model.object3D.position.set(0, -min2.y * scaleFactor, 0);
 
-    if (size2.x > 0) {
-      const s = targetWidth / size2.x;
-      model.object3D.scale.set(s, s, s);
-      console.log('applied scale:', s);
-    }
+      status.textContent =
+        `Model loaded
+Native width: ${nativeWidth.toFixed(6)}
+Target width: ${REAL_MODEL_WIDTH_METERS.toFixed(6)} m
+Scale factor: ${scaleFactor.toFixed(6)}`;
+    });
 
-    // Put the bottom of the model on the marker plane
-    model.object3D.position.set(0, -min2.y * model.object3D.scale.y, 0);
-
-    status.textContent = 'Model centered and scaled';
-  });
-
-  model.addEventListener('model-error', (e) => {
-    console.error('model error', e);
-    status.textContent = 'Model failed to render';
-  });
+    model.addEventListener('model-error', (e) => {
+      console.error('model error', e);
+      status.textContent = 'Model failed to render';
+    });
   </script>
 </body>
 </html>

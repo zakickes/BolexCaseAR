@@ -54,38 +54,81 @@
   </a-scene>
 
   <script>
-    const status = document.getElementById('status');
-    const marker = document.getElementById('marker');
-    const model = document.getElementById('model');
-    const asset = document.getElementById('bolexModel');
+  const status = document.getElementById('status');
+  const marker = document.getElementById('marker');
+  const model = document.getElementById('model');
+  const asset = document.getElementById('bolexModel');
 
-    marker.addEventListener('markerFound', () => {
-      status.textContent = 'Marker found';
-    });
+  marker.addEventListener('markerFound', () => {
+    status.textContent = 'Marker found';
+  });
 
-    marker.addEventListener('markerLost', () => {
-      status.textContent = 'Marker lost';
-    });
+  marker.addEventListener('markerLost', () => {
+    status.textContent = 'Marker lost';
+  });
 
-    asset.addEventListener('loaded', () => {
-      console.log('asset loaded');
-      status.textContent = 'GLB asset loaded';
-    });
+  asset.addEventListener('loaded', () => {
+    console.log('asset loaded');
+    status.textContent = 'GLB asset loaded';
+  });
 
-    asset.addEventListener('error', (e) => {
-      console.error('asset error', e);
-      status.textContent = 'GLB asset failed to load';
-    });
+  asset.addEventListener('error', (e) => {
+    console.error('asset error', e);
+    status.textContent = 'GLB asset failed to load';
+  });
 
-    model.addEventListener('model-loaded', (e) => {
-      console.log('model loaded', e);
-      status.textContent = 'Model loaded';
-    });
+  model.addEventListener('model-loaded', () => {
+    const mesh = model.getObject3D('mesh');
 
-    model.addEventListener('model-error', (e) => {
-      console.error('model error', e);
-      status.textContent = 'Model failed to render';
-    });
+    if (!mesh) {
+      status.textContent = 'Model loaded but mesh not found';
+      return;
+    }
+
+    const box = new THREE.Box3().setFromObject(mesh);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+
+    console.log('original size:', size);
+    console.log('original center:', center);
+
+    // Recenter mesh so its true center sits on the marker origin
+    mesh.position.x -= center.x;
+    mesh.position.y -= center.y;
+    mesh.position.z -= center.z;
+
+    // Recompute after recentering
+    const box2 = new THREE.Box3().setFromObject(mesh);
+    const size2 = new THREE.Vector3();
+    const min2 = new THREE.Vector3();
+    box2.getSize(size2);
+    box2.getMin(min2);
+
+    console.log('recentered size:', size2);
+    console.log('recentered min:', min2);
+
+    // Set desired real-world width of the model
+    // Change this to the width you want in meters
+    const targetWidth = 0.2032; // 8 inches
+
+    if (size2.x > 0) {
+      const s = targetWidth / size2.x;
+      model.object3D.scale.set(s, s, s);
+      console.log('applied scale:', s);
+    }
+
+    // Put the bottom of the model on the marker plane
+    model.object3D.position.set(0, -min2.y * model.object3D.scale.y, 0);
+
+    status.textContent = 'Model centered and scaled';
+  });
+
+  model.addEventListener('model-error', (e) => {
+    console.error('model error', e);
+    status.textContent = 'Model failed to render';
+  });
   </script>
 </body>
 </html>

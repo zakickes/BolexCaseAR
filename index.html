@@ -30,105 +30,70 @@
 </head>
 
 <body>
-  <div id="status">Loading AR…</div>
 
-  <a-scene embedded arjs renderer="colorManagement: true;">
-    <a-assets>
-      <a-asset-item id="bolexModel" src="model_bolex.glb"></a-asset-item>
-    </a-assets>
+<div id="status">Loading AR…</div>
 
-    <a-marker preset="hiro" size="0.825" id="marker">
-      <a-entity light="type: ambient; intensity: 1.5"></a-entity>
-      <a-entity light="type: directional; intensity: 1.5" position="1 2 1"></a-entity>
+<a-scene embedded arjs renderer="colorManagement: true;">
 
-      <a-entity
-        id="model"
-        gltf-model="#bolexModel"
-        position="0 0.5 0"
-        rotation="0 0 0"
-        scale="1 1 1">
-      </a-entity>
-    </a-marker>
+  <a-assets>
+    <a-asset-item id="bolexModel" src="model_bolex.glb"></a-asset-item>
+  </a-assets>
 
-    <a-entity camera></a-entity>
-  </a-scene>
+  <a-marker preset="hiro" size="0.083" id="marker">
 
-  <script>
-  const status = document.getElementById('status');
-  const marker = document.getElementById('marker');
-  const model = document.getElementById('model');
-  const asset = document.getElementById('bolexModel');
+    <a-entity light="type: ambient; intensity: 1.5"></a-entity>
+    <a-entity light="type: directional; intensity: 1.5" position="1 2 1"></a-entity>
 
-  marker.addEventListener('markerFound', () => {
-    status.textContent = 'Marker found';
-  });
+    <a-entity
+      id="model"
+      gltf-model="#bolexModel"
+      position="0 0 0"
+      rotation="0 0 0"
+      scale="12.05 12.05 12.05">
+    </a-entity>
 
-  marker.addEventListener('markerLost', () => {
-    status.textContent = 'Marker lost';
-  });
+  </a-marker>
 
-  asset.addEventListener('loaded', () => {
-    console.log('asset loaded');
-    status.textContent = 'GLB asset loaded';
-  });
+  <a-entity camera></a-entity>
 
-  asset.addEventListener('error', (e) => {
-    console.error('asset error', e);
-    status.textContent = 'GLB asset failed to load';
-  });
+</a-scene>
 
-  model.addEventListener('model-loaded', () => {
-    const mesh = model.getObject3D('mesh');
+<script>
 
-    if (!mesh) {
-      status.textContent = 'Model loaded but mesh not found';
-      return;
-    }
+const status = document.getElementById('status');
+const marker = document.getElementById('marker');
+const model = document.getElementById('model');
+const asset = document.getElementById('bolexModel');
 
-    const box = new THREE.Box3().setFromObject(mesh);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
+marker.addEventListener('markerFound', () => {
+  status.textContent = 'Marker found';
+});
 
-    console.log('original size:', size);
-    console.log('original center:', center);
+marker.addEventListener('markerLost', () => {
+  status.textContent = 'Marker lost';
+});
 
-    // Recenter mesh so its true center sits on the marker origin
-    mesh.position.x -= center.x;
-    mesh.position.y -= center.y;
-    mesh.position.z -= center.z;
+asset.addEventListener('loaded', () => {
+  console.log('asset loaded');
+  status.textContent = 'GLB asset loaded';
+});
 
-    // Recompute after recentering
-    const box2 = new THREE.Box3().setFromObject(mesh);
-    const size2 = new THREE.Vector3();
-    const min2 = new THREE.Vector3();
-    box2.getSize(size2);
-    box2.getMin(min2);
+asset.addEventListener('error', (e) => {
+  console.error('asset error', e);
+  status.textContent = 'GLB asset failed to load';
+});
 
-    console.log('recentered size:', size2);
-    console.log('recentered min:', min2);
+model.addEventListener('model-loaded', (e) => {
+  console.log('model loaded', e);
+  status.textContent = 'Model loaded';
+});
 
-    // Set desired real-world width of the model
-    // Change this to the width you want in meters
-    const targetWidth = 0.2032; // 8 inches
+model.addEventListener('model-error', (e) => {
+  console.error('model error', e);
+  status.textContent = 'Model failed to render';
+});
 
-    if (size2.x > 0) {
-      const s = targetWidth / size2.x;
-      model.object3D.scale.set(s, s, s);
-      console.log('applied scale:', s);
-    }
+</script>
 
-    // Put the bottom of the model on the marker plane
-    model.object3D.position.set(0, -min2.y * model.object3D.scale.y, 0);
-
-    status.textContent = 'Model centered and scaled';
-  });
-
-  model.addEventListener('model-error', (e) => {
-    console.error('model error', e);
-    status.textContent = 'Model failed to render';
-  });
-  </script>
 </body>
 </html>

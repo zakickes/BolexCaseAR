@@ -33,7 +33,14 @@
 
 <div id="status">Loading AR…</div>
 
-<a-scene embedded arjs renderer="colorManagement: true;">
+<a-scene
+  embedded
+  renderer="colorManagement: true;"
+  arjs="sourceType: webcam;
+        sourceWidth:1280;
+        sourceHeight:960;
+        displayWidth:1280;
+        displayHeight:960;">
 
   <a-assets>
     <a-asset-item id="bolexModel" src="model_bolex.glb?v=13"></a-asset-item>
